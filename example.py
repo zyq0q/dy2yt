@@ -123,27 +123,27 @@ if __name__ == '__main__':
 
     # ======================调用上传=====================
     # 要调用的Python文件和命令模板
-    python_file = 'upload_video.py'
-    command_template = 'python3 {file} --file="{video_file}" --title="{title}" --description="{description}" --keywords="{keywords}" --category="{category}" --privacyStatus="{privacy}"'
+    #python_file = 'upload_video.py'
+    #command_template = 'python3 {file} --file="{video_file}" --title="{title}" --description="{description}" --keywords="{keywords}" --category="{category}" --privacyStatus="{privacy}"'
 
     # 创建 ConfigParser 实例
-    config = configparser.ConfigParser()
+    #config = configparser.ConfigParser()
 
     # 读取 INI 文件
-    config.read('data.ini')
+    #config.read('data.ini')
 
     # 获取指定节（section）下的键值对
-    vendor_data = config['upList']
+    #vendor_data = config['upList']
     # 填充命令模板的参数
-    video_file = vendor_data['file']
-    title = vendor_data['title']
-    description = vendor_data['description']
-    keywords = vendor_data['keywords']
-    category = vendor_data['category']
-    privacy =  vendor_data['privacystatus']
+    #video_file = vendor_data['file']
+    #title = vendor_data['title']
+    #description = vendor_data['description']
+    #keywords = vendor_data['keywords']
+    #category = vendor_data['category']
+    #privacy =  vendor_data['privacystatus']
 
     # 构建完整的命令
-    command = command_template.format(file=python_file, video_file=video_file, title=title, description=description, keywords=keywords, category=category, privacy=privacy)
+    #command = command_template.format(file=python_file, video_file=video_file, title=title, description=description, keywords=keywords, category=category, privacy=privacy)
 
     # 调用其他Python文件并执行命令
-    subprocess.run(command, shell=True)
+    #subprocess.run(command, shell=True)
