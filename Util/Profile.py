@@ -17,6 +17,10 @@ Change Log  :
 '''
 
 import Util
+import json
+import shutil
+from time import strftime, localtime
+import os
 
 
 
@@ -86,8 +90,8 @@ class Profile:
         match = None
 
         async with session.get(url=Util.reFind(inputs),
-                                timeout=10,
-                                allow_redirects=True) as response:
+                               timeout=10,
+                               allow_redirects=True) as response:
             # 检查响应状态码，如果不是200和444，会抛出异常
             if response.status in {200, 444}:
                 if 'v.douyin.com' in inputs:
@@ -256,9 +260,9 @@ class Profile:
         try:
             async with Util.aiohttp.ClientSession() as session:
                 async with session.get(url=domain + params[0],
-                                        headers=headers,
-                                        data=request_data,
-                                        proxy=None, timeout=10) as response:
+                                       headers=headers,
+                                       data=request_data,
+                                       proxy=None, timeout=10) as response:
                     if response.status == 200:
                         data = await response.json()
                         info_status_code = data.get("status_code", None)
@@ -302,8 +306,8 @@ class Profile:
         try:
             async with Util.aiohttp.ClientSession() as session:
                 async with session.get(url=domain + params[0],
-                                        headers=headers,
-                                        proxy=None, timeout=10) as response:
+                                       headers=headers,
+                                       proxy=None, timeout=10) as response:
                     if response.status == 200:
                         if response.text != '':
                             data = await response.json()
@@ -432,7 +436,28 @@ class Profile:
             await self.download.AwemeDownload(aweme_data)
         Util.progress.console.print(f'[  提示  ]:抓获{self.max_cursor}页数据成功! 该页共{len(aweme_data)}个作品。\r')
         Util.log.info(f'[  提示  ]:抓获{self.max_cursor}页数据成功! 该页共{len(aweme_data)}个作品。')
-
+        v_info = aweme_data[0]
+        print("v_info:")
+        print(v_info)
+        # 创建一个字典对象，用于存储数据
+        data = { "id": v_info['aweme_id'],"title": v_info['desc'] }
+        # 将字典对象转换为json字符串，设置缩进为4，保证输出中文字符
+        json_str = json.dumps(data, indent=4, ensure_ascii=False)
+        v_path = v_info['path']+"/"+v_info['desc'];
+        # 以写入模式打开一个json文件，使用with语句自动关闭文件
+        with open(v_path+"/"+v_info['desc']+".json", "w", encoding="utf-8") as f:
+            # 将json字符串写入文件中
+            f.write(json_str)
+        date = strftime('%Y%m%d',localtime())
+        target_path_name="/opt/bili/yt2b_zqy_b/video_file/file_"+date
+        try:
+            if not os.path.exists(target_path_name):
+                os.makedirs(target_path_name)
+            shutil.move(v_path+"/"+v_info['desc']+".json",target_path_name+"/"+v_info['desc']+".json")
+            shutil.move(v_path+"/"+v_info['desc']+"_video.mp4",target_path_name+"/"+v_info['desc']+".mp4")
+            shutil.move(v_path+"/"+v_info['desc']+"_cover.png",target_path_name+"/"+v_info['desc']+".png")
+        except Exception as e:
+            print(e.args)
     async def get_Profile(self,count: int = 20) -> None:
         """
         获取用户的Profile并设置相应的实例变量。
@@ -472,7 +497,7 @@ class Profile:
             # 保存用户主页链接
             with open(Util.os.path.join(self.path,
                                         self.nickname + '.txt'),
-                                        'w') as f:
+                      'w') as f:
                 f.write(f"https://www.douyin.com/user/{self.sec_user_id}")
             Util.progress.console.print('[  提示  ]:批量获取所有视频中!\r')
             Util.log.info('[  提示  ]:批量获取所有视频中!')

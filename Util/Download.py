@@ -20,6 +20,8 @@ import Util
 import os
 import json
 import configparser
+import hashlib
+
 
 XB = Util.XBogus()
 URLS = Util.Urls()
@@ -34,7 +36,7 @@ class Download:
         # 异步的任务数
         self.semaphore = Util.asyncio.Semaphore(int(self.config['max_tasks']))
 
-        
+
 
     def trim_filename(self, filename: str, max_length: int = 50) -> str:
         """
@@ -141,13 +143,13 @@ class Download:
             full_path = Util.os.path.join(base_path, file_path)
             if Util.os.path.exists(full_path):
                 task_id = Util.progress.add_task(description=f"[  跳过  ]:",
-                                                filename=self.trim_filename(file_path, 50),
-                                                total=1, completed=1)
+                                                 filename=self.trim_filename(file_path, 50),
+                                                 total=1, completed=1)
                 Util.progress.update(task_id, completed=1)
             else:
                 task_id = Util.progress.add_task(description=f"[  {file_type}  ]:",
-                                                filename=self.trim_filename(file_path, 50),
-                                                start=False)
+                                                 filename=self.trim_filename(file_path, 50),
+                                                 start=False)
                 Util.progress.start_task(task_id)
                 with open(full_path, 'w', encoding='utf-8') as desc_file:
                     desc_file.write(desc_content)
@@ -173,13 +175,13 @@ class Download:
             full_path = Util.os.path.join(base_path, file_path)
             if Util.os.path.exists(full_path):
                 task_id = Util.progress.add_task(description=f"[  跳过  ]:",
-                                                filename=self.trim_filename(file_path, 50),
-                                                total=1, completed=1)
+                                                 filename=self.trim_filename(file_path, 50),
+                                                 total=1, completed=1)
                 Util.progress.update(task_id, completed=1)
             else:
                 task_id = Util.progress.add_task(description=f"[  {file_type}  ]:",
-                                                filename=self.trim_filename(file_path, 50),
-                                                start=False)
+                                                 filename=self.trim_filename(file_path, 50),
+                                                 start=False)
                 download_task = Util.asyncio.create_task(self.download_file(task_id, file_url, full_path))
                 download_tasks.append(download_task)
                 # 这将使事件循环继续进行，允许任务立即开始
@@ -205,7 +207,7 @@ class Download:
         new_set.append(first_element)
 
         # 判断是否下载过
-        try: 
+        try:
             dy_file = 'DYdownload_history.json'
             dy_vedio_id_list = []
             dy_js = []
@@ -219,27 +221,27 @@ class Download:
                 print('视频已下载.......')
                 return
             else:
-                
+
                 dy_vedio_id_list.append(aweme_id)
                 dy_js.append({'url': first_element['video_url_list'][0], 'aweme_id':aweme_id,'time': first_element['create_time']})
                 with open(dy_file, "w") as dump_f:
-                        json.dump(dy_js, dump_f)
+                    json.dump(dy_js, dump_f)
                 dump_f.close()
 
                 # 没有下载过，把上传的标题、路径保存下载
                 config = configparser.ConfigParser()
         except Exception:
-                Util.progress.console.print("[  失败  ]:判断是否下载过。")
-                Util.log.warning(f"[  失败  ]:判断是否下载过 异常：{Exception}")
-                return
-            
-            
-            
+            Util.progress.console.print("[  失败  ]:判断是否下载过。")
+            Util.log.warning(f"[  失败  ]:判断是否下载过 异常：{Exception}")
+            return
+
+
+
         print('============================')
 
         for aweme in new_set:
-            aweme_time = Util.time.strptime(aweme['create_time'], '%Y-%m-%d %H.%M.%S')    
-            # print(aweme['create_time'])   
+            aweme_time = Util.time.strptime(aweme['create_time'], '%Y-%m-%d %H.%M.%S')
+            # print(aweme['create_time'])
             # 如果设置了日期区间并且作品的发布日期不在指定的日期范围内，则跳过
             if should_check_interval:
                 # 如果 aweme_time 比不符合时间区间，跳过当前的作品
@@ -271,8 +273,8 @@ class Download:
             up_data['aweme_id'] = first_element['aweme_id']
             up_data['create_time'] = first_element['create_time']
             up_data['path'] = desc_path
-            
-            
+
+
             """
             # 原声下载
             if self.config['music'].lower() == 'yes':
@@ -291,6 +293,7 @@ class Download:
                     video_name = f"{await format_file_name(aweme, self.config['naming'])}_video"
                     up_data['file'] = desc_path + '/' + video_name + '.mp4'
                     await initiate_download("视频", video_url, ".mp4", desc_path, video_name)
+
                 except Exception:
                     Util.progress.console.print("[  失败  ]:该视频不可用，无法下载。")
                     Util.log.warning(f"[  失败  ]:该视频不可用，无法下载。{aweme} 异常：{Exception}")
@@ -326,7 +329,7 @@ class Download:
                     Util.log.warning(f"[  失败  ]:保存文案失败。{aweme} 异常：{Exception}")
 
         config['upList'] = up_data
-        
+
         # 清空文件内容
         with open('data.ini', 'w') as configfile:
             configfile.write('')
@@ -336,3 +339,4 @@ class Download:
             config.write(configfile)
         # 等待本页所有的下载任务完成, 如果不等待的话就会还没等下完就去下载下一页了, 并发下载多了会被服务器断开连接
         await Util.asyncio.gather(*download_tasks)
+
