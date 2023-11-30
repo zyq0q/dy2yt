@@ -440,7 +440,7 @@ class Profile:
         print("v_info:")
         print(v_info)
         # 创建一个字典对象，用于存储数据
-        data = { "id": v_info['aweme_id'],"title": v_info['desc'] }
+        data = { "id": v_info['aweme_id'],"title": v_info['desc'],"uploader_url":"https://douyin.com" }
         # 将字典对象转换为json字符串，设置缩进为4，保证输出中文字符
         json_str = json.dumps(data, indent=4, ensure_ascii=False)
         v_path = v_info['path']+"/"+v_info['desc'];
