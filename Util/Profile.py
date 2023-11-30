@@ -453,7 +453,7 @@ class Profile:
         try:
             if not os.path.exists(target_path_name):
                 os.makedirs(target_path_name)
-            shutil.move(v_path+"/"+v_info['desc']+".json",target_path_name+"/"+v_info['desc']+".json")
+            shutil.move(v_path+"/"+v_info['desc']+".json",target_path_name+"/"+v_info['desc']+".info.json")
             shutil.move(v_path+"/"+v_info['desc']+"_video.mp4",target_path_name+"/"+v_info['desc']+".mp4")
             shutil.move(v_path+"/"+v_info['desc']+"_cover.png",target_path_name+"/"+v_info['desc']+".png")
         except Exception as e:
